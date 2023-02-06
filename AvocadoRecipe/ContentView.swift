@@ -6,83 +6,101 @@
 //
 
 import SwiftUI
-import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
-    var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
-                    }
-                }
-                .onDelete(perform: deleteItems)
+  // MARK: - PROPERTIES
+  
+  var headers: [Header] = headersData
+  var facts: [Fact] = factsData
+  var recipes: [Recipe] = recipesData
+  
+  var body: some View {
+    ScrollView(.vertical, showsIndicators: false) {
+      VStack(alignment: .center, spacing: 20) {
+        // MARK: - HEADER
+        
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(alignment: .top, spacing: 0) {
+            ForEach(headers) { item in
+              HeaderView(header: item)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
+          }
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        
+        // MARK: - DISHES
+        
+        Text("Avocado Dishes")
+          .fontWeight(.bold)
+          .modifier(TitleModifier())
+        
+        DishesView()
+          .frame(maxWidth: 640)
+        
+        // MARK: - AVOCADO FACTS
+        
+        Text("Avocado Facts")
+          .fontWeight(.bold)
+          .modifier(TitleModifier())
+        
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(alignment: .top, spacing: 60) {
+            ForEach(facts) { item in
+              FactsView(fact: item)
             }
+          }
+          .padding(.vertical)
+          .padding(.leading, 60)
+          .padding(.trailing, 20)
         }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+        
+        // MARK: - RECIPE CARDS
+        
+        Text("Avocado Recipes")
+          .fontWeight(.bold)
+          .modifier(TitleModifier())
+        
+        VStack(alignment: .center, spacing: 20) {
+          ForEach(recipes) { item in
+            RecipeCardView(recipe: item)
+          }
         }
+        .frame(maxWidth: 640)
+        .padding(.horizontal)
+        
+        // MARK: - FOOTER
+        
+        VStack(alignment: .center, spacing: 20) {
+          Text("All About Avocados")
+            .fontWeight(.bold)
+            .modifier(TitleModifier())
+          Text("Everything you wanted to know about avocados but were too afraid to ask.")
+            .font(.system(.body, design: .serif))
+            .multilineTextAlignment(.center)
+            .foregroundColor(Color.gray)
+            .frame(minHeight: 60)
+        }
+        .frame(maxWidth: 640)
+        .padding()
+        .padding(.bottom, 85)
+      }
     }
+    .edgesIgnoringSafeArea(.all)
+    .padding(0)
+  }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
+struct TitleModifier: ViewModifier {
+  func body(content: Content) -> some View {
+    content
+      .font(.system(.title, design: .serif))
+      .foregroundColor(Color("ColorGreenAdaptive"))
+      .padding(8)
+  }
+}
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-    }
+  static var previews: some View {
+    ContentView(headers: headersData, facts: factsData, recipes: recipesData)
+      .previewDevice("iPhone 13")
+  }
 }
