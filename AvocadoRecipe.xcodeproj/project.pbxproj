@@ -100,9 +100,9 @@
 				EBE99936299111ED00C1D275 /* Data */,
 				EBE99927299111E200C1D275 /* Assets.xcassets */,
 				EBD3EBA629ACBF3200AF5E8D /* LaunchScreen.storyboard */,
-				EBE99929299111E200C1D275 /* Preview Content */,
 				EBD3EBA829ACBF7D00AF5E8D /* AppDelegate.swift */,
 				EBD3EBAA29ACBF8D00AF5E8D /* SceneDelegate.swift */,
+				EBE99929299111E200C1D275 /* Preview Content */,
 			);
 			path = AvocadoRecipe;
 			sourceTree = "<group>";
